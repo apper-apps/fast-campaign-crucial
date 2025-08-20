@@ -9,7 +9,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: "/profile", icon: "User", label: "Candidate Profile" },
     { to: "/post-planner", icon: "Calendar", label: "Post Planner" },
     { to: "/whatsapp", icon: "MessageCircle", label: "WhatsApp Generator" },
-    { to: "/voice", icon: "Mic", label: "Voice Generator" },
+{ to: "/voice", icon: "AudioWaveform", label: "AI Voice Generator" },
     { to: "/press", icon: "FileText", label: "Press Release" },
     { to: "/speech", icon: "FileTextIcon", label: "Speech Writer" },
     { to: "/slogans", icon: "Lightbulb", label: "Slogan Generator" },
