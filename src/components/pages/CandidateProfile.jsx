@@ -8,20 +8,21 @@ import Error from "@/components/ui/Error";
 import candidateProfileService from "@/services/api/candidateProfileService";
 
 const CandidateProfile = () => {
-  const [profile, setProfile] = useState({
-    personalBackground: "",
-    politicalHistory: "",
-    achievements: "",
-    vision: "",
-    socialWork: "",
-    corePositioning: "",
-    partyManifesto: "",
-    brandKit: {
-      primaryColor: "#1E3A8A",
-      secondaryColor: "#DC2626",
-      accentColor: "#F59E0B",
-      slogan: ""
-    }
+const [profile, setProfile] = useState({
+    Name: "",
+    personal_background_c: "",
+    political_history_c: "",
+    achievements_c: "",
+    vision_c: "",
+    social_work_c: "",
+    core_positioning_c: "",
+    party_manifesto_c: "",
+    primary_color_c: "#1E3A8A",
+    secondary_color_c: "#DC2626",
+    accent_color_c: "#F59E0B",
+    logo_c: "",
+    fonts_c: "",
+    slogan_c: ""
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -34,7 +35,24 @@ const CandidateProfile = () => {
       setError(null);
       const currentProfile = await candidateProfileService.getCurrent();
       if (currentProfile) {
-        setProfile(currentProfile);
+        // Transform database structure to UI structure
+        setProfile({
+          Id: currentProfile.Id,
+          Name: currentProfile.Name || "",
+          personal_background_c: currentProfile.personal_background_c || "",
+          political_history_c: currentProfile.political_history_c || "",
+          achievements_c: currentProfile.achievements_c || "",
+          vision_c: currentProfile.vision_c || "",
+          social_work_c: currentProfile.social_work_c || "",
+          core_positioning_c: currentProfile.core_positioning_c || "",
+          party_manifesto_c: currentProfile.party_manifesto_c || "",
+          primary_color_c: currentProfile.primary_color_c || "#1E3A8A",
+          secondary_color_c: currentProfile.secondary_color_c || "#DC2626",
+          accent_color_c: currentProfile.accent_color_c || "#F59E0B",
+          logo_c: currentProfile.logo_c || "",
+          fonts_c: currentProfile.fonts_c || "",
+          slogan_c: currentProfile.slogan_c || ""
+        });
       }
     } catch (err) {
       setError(err.message);
@@ -47,19 +65,8 @@ const CandidateProfile = () => {
     loadProfile();
   }, []);
 
-  const handleInputChange = (field, value) => {
-    if (field.includes(".")) {
-      const [parent, child] = field.split(".");
-      setProfile(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
-    } else {
-      setProfile(prev => ({ ...prev, [field]: value }));
-    }
+const handleInputChange = (field, value) => {
+    setProfile(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
@@ -131,18 +138,18 @@ const CandidateProfile = () => {
         <div className="p-6">
           {activeTab === "personal" && (
             <div className="space-y-6">
-              <TextArea
+<TextArea
                 label="Personal Background"
                 placeholder="Describe your personal background, education, and community ties..."
-                value={profile.personalBackground}
-                onChange={(e) => handleInputChange("personalBackground", e.target.value)}
+                value={profile.personal_background_c}
+                onChange={(e) => handleInputChange("personal_background_c", e.target.value)}
                 rows={4}
               />
               <TextArea
                 label="Social Work"
                 placeholder="Detail your social work and community service initiatives..."
-                value={profile.socialWork}
-                onChange={(e) => handleInputChange("socialWork", e.target.value)}
+                value={profile.social_work_c}
+                onChange={(e) => handleInputChange("social_work_c", e.target.value)}
                 rows={4}
               />
             </div>
@@ -150,18 +157,18 @@ const CandidateProfile = () => {
 
           {activeTab === "political" && (
             <div className="space-y-6">
-              <TextArea
+<TextArea
                 label="Political History"
                 placeholder="Outline your political journey, positions held, and key milestones..."
-                value={profile.politicalHistory}
-                onChange={(e) => handleInputChange("politicalHistory", e.target.value)}
+                value={profile.political_history_c}
+                onChange={(e) => handleInputChange("political_history_c", e.target.value)}
                 rows={4}
               />
               <TextArea
                 label="Core Positioning"
                 placeholder="Define your core political positioning and key differentiators..."
-                value={profile.corePositioning}
-                onChange={(e) => handleInputChange("corePositioning", e.target.value)}
+                value={profile.core_positioning_c}
+                onChange={(e) => handleInputChange("core_positioning_c", e.target.value)}
                 rows={3}
               />
             </div>
@@ -169,11 +176,11 @@ const CandidateProfile = () => {
 
           {activeTab === "achievements" && (
             <div className="space-y-6">
-              <TextArea
+<TextArea
                 label="Key Achievements"
                 placeholder="List your major achievements, awards, and recognitions..."
-                value={profile.achievements}
-                onChange={(e) => handleInputChange("achievements", e.target.value)}
+                value={profile.achievements_c}
+                onChange={(e) => handleInputChange("achievements_c", e.target.value)}
                 rows={5}
               />
             </div>
@@ -181,18 +188,18 @@ const CandidateProfile = () => {
 
           {activeTab === "vision" && (
             <div className="space-y-6">
-              <TextArea
+<TextArea
                 label="Vision Statement"
                 placeholder="Articulate your vision for the community and future goals..."
-                value={profile.vision}
-                onChange={(e) => handleInputChange("vision", e.target.value)}
+                value={profile.vision_c}
+                onChange={(e) => handleInputChange("vision_c", e.target.value)}
                 rows={4}
               />
               <TextArea
                 label="Party Manifesto"
                 placeholder="Describe your party's manifesto and key policy positions..."
-                value={profile.partyManifesto}
-                onChange={(e) => handleInputChange("partyManifesto", e.target.value)}
+                value={profile.party_manifesto_c}
+                onChange={(e) => handleInputChange("party_manifesto_c", e.target.value)}
                 rows={4}
               />
             </div>
@@ -206,15 +213,15 @@ const CandidateProfile = () => {
                     Primary Color
                   </label>
                   <div className="flex items-center space-x-2">
-                    <input
+<input
                       type="color"
-                      value={profile.brandKit.primaryColor}
-                      onChange={(e) => handleInputChange("brandKit.primaryColor", e.target.value)}
+                      value={profile.primary_color_c}
+                      onChange={(e) => handleInputChange("primary_color_c", e.target.value)}
                       className="w-12 h-10 rounded border border-gray-300"
                     />
                     <Input
-                      value={profile.brandKit.primaryColor}
-                      onChange={(e) => handleInputChange("brandKit.primaryColor", e.target.value)}
+                      value={profile.primary_color_c}
+                      onChange={(e) => handleInputChange("primary_color_c", e.target.value)}
                       placeholder="#1E3A8A"
                     />
                   </div>
@@ -226,13 +233,13 @@ const CandidateProfile = () => {
                   <div className="flex items-center space-x-2">
                     <input
                       type="color"
-                      value={profile.brandKit.secondaryColor}
-                      onChange={(e) => handleInputChange("brandKit.secondaryColor", e.target.value)}
+                      value={profile.secondary_color_c}
+                      onChange={(e) => handleInputChange("secondary_color_c", e.target.value)}
                       className="w-12 h-10 rounded border border-gray-300"
                     />
                     <Input
-                      value={profile.brandKit.secondaryColor}
-                      onChange={(e) => handleInputChange("brandKit.secondaryColor", e.target.value)}
+                      value={profile.secondary_color_c}
+                      onChange={(e) => handleInputChange("secondary_color_c", e.target.value)}
                       placeholder="#DC2626"
                     />
                   </div>
@@ -244,13 +251,13 @@ const CandidateProfile = () => {
                   <div className="flex items-center space-x-2">
                     <input
                       type="color"
-                      value={profile.brandKit.accentColor}
-                      onChange={(e) => handleInputChange("brandKit.accentColor", e.target.value)}
+                      value={profile.accent_color_c}
+                      onChange={(e) => handleInputChange("accent_color_c", e.target.value)}
                       className="w-12 h-10 rounded border border-gray-300"
                     />
                     <Input
-                      value={profile.brandKit.accentColor}
-                      onChange={(e) => handleInputChange("brandKit.accentColor", e.target.value)}
+                      value={profile.accent_color_c}
+                      onChange={(e) => handleInputChange("accent_color_c", e.target.value)}
                       placeholder="#F59E0B"
                     />
                   </div>
@@ -259,8 +266,8 @@ const CandidateProfile = () => {
               <Input
                 label="Campaign Slogan"
                 placeholder="Enter your campaign slogan..."
-                value={profile.brandKit.slogan}
-                onChange={(e) => handleInputChange("brandKit.slogan", e.target.value)}
+                value={profile.slogan_c}
+                onChange={(e) => handleInputChange("slogan_c", e.target.value)}
               />
             </div>
           )}

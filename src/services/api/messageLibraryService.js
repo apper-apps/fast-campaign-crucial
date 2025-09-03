@@ -1,57 +1,224 @@
-import messageLibraryData from "@/services/mockData/messageLibrary.json";
+import { toast } from 'react-toastify';
 
 class MessageLibraryService {
   constructor() {
-    this.messages = [...messageLibraryData];
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'message_library_c';
   }
 
   async getAll() {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return [...this.messages];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "message_text_c" } },
+          { field: { Name: "occasion_c" } },
+          { field: { Name: "language_c" } },
+          { field: { Name: "tone_c" } },
+          { field: { Name: "created_at_c" } }
+        ],
+        orderBy: [
+          { fieldName: "created_at_c", sorttype: "DESC" }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching messages:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return [];
+    }
   }
 
   async getById(id) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const message = this.messages.find(m => m.Id === parseInt(id));
-    if (!message) {
-      throw new Error(`Message with Id ${id} not found`);
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "message_text_c" } },
+          { field: { Name: "occasion_c" } },
+          { field: { Name: "language_c" } },
+          { field: { Name: "tone_c" } },
+          { field: { Name: "created_at_c" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching message with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return null;
     }
-    return { ...message };
   }
 
   async create(messageData) {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const newId = this.messages.length > 0 ? Math.max(...this.messages.map(m => m.Id)) + 1 : 1;
-    const newMessage = {
-      Id: newId,
-      createdAt: new Date().toISOString(),
-      ...messageData
-    };
-    this.messages.push(newMessage);
-    return { ...newMessage };
+    try {
+      // Only include updateable fields
+      const params = {
+        records: [{
+          Name: messageData.Name || "Message",
+          Tags: messageData.Tags || "",
+          message_text_c: messageData.message_text_c || messageData.messageText,
+          occasion_c: messageData.occasion_c || messageData.occasion,
+          language_c: messageData.language_c || messageData.language,
+          tone_c: messageData.tone_c || messageData.tone,
+          created_at_c: messageData.created_at_c || new Date().toISOString()
+        }]
+      };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create message library ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating message:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return null;
+    }
   }
 
   async update(id, messageData) {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const index = this.messages.findIndex(m => m.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error(`Message with Id ${id} not found`);
+    try {
+      // Only include updateable fields
+      const params = {
+        records: [{
+          Id: parseInt(id),
+          Name: messageData.Name || "Message",
+          Tags: messageData.Tags || "",
+          message_text_c: messageData.message_text_c || messageData.messageText,
+          occasion_c: messageData.occasion_c || messageData.occasion,
+          language_c: messageData.language_c || messageData.language,
+          tone_c: messageData.tone_c || messageData.tone,
+          created_at_c: messageData.created_at_c || new Date().toISOString()
+        }]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update message library ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulUpdates.length > 0 ? successfulUpdates[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating message:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return null;
     }
-    this.messages[index] = { ...this.messages[index], ...messageData };
-    return { ...this.messages[index] };
   }
 
   async delete(id) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const index = this.messages.findIndex(m => m.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error(`Message with Id ${id} not found`);
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return false;
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete message library ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting message:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return false;
     }
-    this.messages.splice(index, 1);
-    return true;
   }
 
-async generateMessage(occasion, language, tone, userInput = null) {
+  async generateMessage(occasion, language, tone, userInput = null) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     // Enhanced AI-generated messages with voice input support

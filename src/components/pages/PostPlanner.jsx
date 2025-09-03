@@ -53,9 +53,9 @@ const PostPlanner = () => {
     }
   };
 
-  const handleDateChange = async (ideaId, newDate) => {
+const handleDateChange = async (ideaId, newDate) => {
     try {
-      await postIdeasService.update(ideaId, { postDate: format(newDate, "yyyy-MM-dd") });
+      await postIdeasService.update(ideaId, { post_date_c: format(newDate, "yyyy-MM-dd") });
       loadPostIdeas();
       toast.success("Post date updated successfully!");
     } catch (err) {
@@ -76,8 +76,8 @@ const PostPlanner = () => {
   const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   // Group posts by date
-  const postsByDate = postIdeas.reduce((acc, idea) => {
-    const date = idea.postDate;
+const postsByDate = postIdeas.reduce((acc, idea) => {
+    const date = idea.post_date_c || idea.postDate;
     if (!acc[date]) acc[date] = [];
     acc[date].push(idea);
     return acc;
@@ -167,7 +167,7 @@ const PostPlanner = () => {
                       {format(day, "d")}
                     </div>
                     <div className="space-y-1">
-                      {dayPosts.slice(0, 2).map((post) => (
+{dayPosts.slice(0, 2).map((post) => (
                         <div
                           key={post.Id}
                           className="p-1 bg-gradient-to-r from-primary/10 to-primary/5 rounded text-xs cursor-move"
@@ -177,10 +177,10 @@ const PostPlanner = () => {
                           }}
                         >
                           <div className="font-medium text-primary truncate">
-                            {post.contentType}
+                            {post.content_type_c || post.contentType}
                           </div>
                           <div className="text-gray-600 line-clamp-2">
-                            {post.brief}
+                            {post.brief_c || post.brief}
                           </div>
                         </div>
                       ))}
@@ -202,13 +202,13 @@ const PostPlanner = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">All Post Ideas</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {postIdeas.map((idea) => (
+{postIdeas.map((idea) => (
               <ContentCard
                 key={idea.Id}
-                title={idea.brief}
-                type={idea.contentType}
-                tags={idea.themeTags}
-                status={idea.status}
+                title={idea.brief_c || idea.brief}
+                type={idea.content_type_c || idea.contentType}
+                tags={typeof (idea.theme_tags_c || idea.themeTags) === 'string' ? (idea.theme_tags_c || idea.themeTags).split(',') : (idea.theme_tags_c || idea.themeTags || [])}
+                status={idea.status_c || idea.status}
                 onAction={() => generateCreative(idea.Id)}
                 actionLabel="Generate Creative"
               />

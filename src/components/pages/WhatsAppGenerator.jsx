@@ -100,13 +100,13 @@ const WhatsAppGenerator = () => {
     }
   };
 
-  const saveToLibrary = async (messageText) => {
+const saveToLibrary = async (messageText) => {
     try {
       await messageLibraryService.create({
-        messageText,
-        occasion: formData.occasion,
-        language: formData.language,
-        tone: formData.tone
+        message_text_c: messageText,
+        occasion_c: formData.occasion,
+        language_c: formData.language,
+        tone_c: formData.tone
       });
       toast.success("Message saved to library!");
       loadMessageLibrary();
@@ -245,7 +245,7 @@ const WhatsAppGenerator = () => {
         </div>
       </div>
 
-      {library.length > 0 && (
+{library.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Message Library</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -253,19 +253,19 @@ const WhatsAppGenerator = () => {
               <Card key={message.Id} className="p-4 hover">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex space-x-2 text-xs">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{message.occasion}</span>
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded">{message.language}</span>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{message.occasion_c || message.occasion}</span>
+                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded">{message.language_c || message.language}</span>
                   </div>
                   <Button
                     size="sm"
                     variant="ghost"
                     icon="Copy"
-                    onClick={() => copyToClipboard(message.messageText)}
+                    onClick={() => copyToClipboard(message.message_text_c || message.messageText)}
                   />
                 </div>
-                <p className="text-sm text-gray-700 line-clamp-3">{message.messageText}</p>
+                <p className="text-sm text-gray-700 line-clamp-3">{message.message_text_c || message.messageText}</p>
                 <div className="mt-2 text-xs text-gray-500">
-                  {message.tone} tone
+                  {message.tone_c || message.tone} tone
                 </div>
               </Card>
             ))}

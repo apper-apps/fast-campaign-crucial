@@ -44,12 +44,12 @@ const Dashboard = () => {
     loadDashboardData();
   }, []);
 
-  if (loading) return <Loading message="Loading campaign dashboard..." />;
-  if (error) return <Error message="Failed to load dashboard" description={error} onRetry={loadDashboardData} />;
+  if (loading) return <Loading message="Loading dashboard data..." />;
+  if (error) return <Error message="Failed to load dashboard data" description={error} onRetry={loadDashboardData} />;
 
   const stats = {
     totalIdeas: data.postIdeas.length,
-    draftIdeas: data.postIdeas.filter(idea => idea.status === "Draft").length,
+    draftIdeas: data.postIdeas.filter(idea => (idea.status_c || idea.status) === "Draft").length,
     upcomingEvents: data.events.length,
     savedMessages: data.messages.length
   };
@@ -120,12 +120,12 @@ const Dashboard = () => {
           {recentIdeas.length > 0 ? (
             <div className="space-y-4">
               {recentIdeas.map((idea) => (
-                <ContentCard
+<ContentCard
                   key={idea.Id}
-                  title={idea.brief}
-                  type={idea.contentType}
-                  tags={idea.themeTags}
-                  status={idea.status}
+                  title={idea.brief_c || idea.brief}
+                  type={idea.content_type_c || idea.contentType}
+                  tags={typeof (idea.theme_tags_c || idea.themeTags) === 'string' ? (idea.theme_tags_c || idea.themeTags).split(',') : (idea.theme_tags_c || idea.themeTags || [])}
+                  status={idea.status_c || idea.status}
                   actionLabel="Edit"
                 />
               ))}
@@ -148,19 +148,19 @@ const Dashboard = () => {
             </Button>
           </div>
           {data.events.length > 0 ? (
-            <div className="space-y-4">
+<div className="space-y-4">
               {data.events.slice(0, 4).map((event) => (
                 <div key={event.Id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-xs font-bold text-primary">
-                      {new Date(event.eventDate).getDate()}
+                      {new Date(event.event_date_c || event.eventDate).getDate()}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">{event.eventName}</h3>
-                    <p className="text-sm text-gray-600">{event.location}</p>
+                    <h3 className="font-semibold text-gray-900 truncate">{event.event_name_c || event.eventName}</h3>
+                    <p className="text-sm text-gray-600">{event.location_c || event.location}</p>
                     <p className="text-xs text-gray-500">
-                      {new Date(event.eventDate).toLocaleDateString()}
+                      {new Date(event.event_date_c || event.eventDate).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
