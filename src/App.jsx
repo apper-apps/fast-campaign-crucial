@@ -18,7 +18,7 @@ import Signup from '@/components/pages/Signup';
 import Callback from '@/components/pages/Callback';
 import ErrorPage from '@/components/pages/ErrorPage';
 import ResetPassword from '@/components/pages/ResetPassword';
-import PromptPassword from '@/components/pages/PromptPassword';
+import PromptPassword '@/components/pages/PromptPassword';
 
 // Create auth context
 export const AuthContext = createContext(null);
